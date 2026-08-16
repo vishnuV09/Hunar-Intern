@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password Strength Analyzer & Generator</title>
+  <meta name="description" content="Check password strength instantly. Evaluate entropy, time to crack, security flaws, and generate strong passwords.">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Password Security Analyzer</h1>
+      <p>Analyze your password security, calculate entropy, estimate crack time, and eliminate flaws.</p>
+    </header>
+
+    <!-- Main Analyzer Glass Card -->
+    <div class="glass-card">
+      <div class="input-section">
+        <label for="password-input" class="input-label">Test Your Password</label>
+        <div class="input-wrapper">
+          <input type="password" id="password-input" placeholder="Type or paste password here..." autocomplete="off" spellcheck="false">
+          <button class="toggle-pwd-btn" id="toggle-pwd-btn" title="Toggle Visibility">
+            <svg id="eye-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Realtime Strength Meter -->
+      <div class="meter-section">
+        <div class="meter-header">
+          <div class="strength-label">
+            <span>Strength:</span>
+            <span id="rating-badge" class="badge weak">WEAK</span>
+          </div>
+          <div class="score-num">
+            <span id="score-val">0</span> / 100
+          </div>
+        </div>
+        <div class="meter-track">
+          <div id="meter-fill" class="meter-fill" style="width: 0%; background-color: #ef4444;"></div>
+        </div>
+      </div>
+
+      <!-- Key Stats Grid -->
+      <div class="stats-grid" style="margin-top: 1.5rem;">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          </div>
+          <div class="stat-info">
+            <h4>Est. Crack Time</h4>
+            <p id="stat-crack-time">Instant</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4H8v-2h2V9h2v2h2v2h-2v4z"/></svg>
+          </div>
+          <div class="stat-info">
+            <h4>Entropy Score</h4>
+            <p id="stat-entropy">0.0 bits</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+          </div>
+          <div class="stat-info">
+            <h4>Total Length</h4>
+            <p id="stat-length">0 chars</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Checklist -->
+      <div class="checklist-title">
+        <span>🛡️ Security Checklist Criteria</span>
+      </div>
+      <div class="checklist-grid" id="checklist-grid">
+        <div class="check-item fail" id="check-len8">
+          <span class="check-icon">✕</span>
+          <span>Minimum 8 Characters</span>
+        </div>
+        <div class="check-item fail" id="check-len12">
+          <span class="check-icon">✕</span>
+          <span>Recommended 12+ Characters</span>
+        </div>
+        <div class="check-item fail" id="check-lower">
+          <span class="check-icon">✕</span>
+          <span>Lowercase Letters (a-z)</span>
+        </div>
+        <div class="check-item fail" id="check-upper">
+          <span class="check-icon">✕</span>
+          <span>Uppercase Letters (A-Z)</span>
+        </div>
+        <div class="check-item fail" id="check-digits">
+          <span class="check-icon">✕</span>
+          <span>Numbers (0-9)</span>
+        </div>
+        <div class="check-item fail" id="check-symbols">
+          <span class="check-icon">✕</span>
+          <span>Special Symbols (!@#$)</span>
+        </div>
+        <div class="check-item fail" id="check-patterns">
+          <span class="check-icon">✕</span>
+          <span>No Common Leaked Patterns</span>
+        </div>
+        <div class="check-item fail" id="check-repeats">
+          <span class="check-icon">✕</span>
+          <span>No Repeated Characters</span>
+        </div>
+      </div>
+
+      <!-- Flaws & Recommendations -->
+      <div id="flaws-container" class="feedback-box" style="display: none;">
+        <h4 style="color: var(--weak-color);">⚠️ Detected Flaws</h4>
+        <ul class="feedback-list flaws-list" id="flaws-list"></ul>
+      </div>
+
+      <div class="feedback-box">
+        <h4 style="color: var(--primary);">💡 Recommendations</h4>
+        <ul class="feedback-list" id="suggestions-list">
+          <li>Enter a password to begin analysis.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Password Generator Card -->
+    <div class="glass-card">
+      <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">⚡ Strong Password Generator</h2>
+      <div class="generator-section">
+        <div class="gen-controls">
+          <div class="slider-container">
+            <label for="gen-length" style="font-weight: 600;">Length: <span id="gen-length-val" style="color: var(--primary);">16</span> chars</label>
+            <input type="range" id="gen-length" min="12" max="32" value="16">
+          </div>
+          <button class="btn" id="generate-btn">⚡ Generate Password</button>
+        </div>
+
+        <div class="gen-result">
+          <span class="gen-pwd-text" id="gen-pwd-output">Click generate to create</span>
+          <button class="btn btn-secondary" id="copy-btn" title="Copy to Clipboard">📋 Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      🔒 Antigravity Password Security Tool • Built with Python & Flask
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Copied to clipboard!</div>
+
+  <script>
+    const passwordInput = document.getElementById('password-input');
+    const toggleBtn = document.getElementById('toggle-pwd-btn');
+    const ratingBadge = document.getElementById('rating-badge');
+    const scoreVal = document.getElementById('score-val');
+    const meterFill = document.getElementById('meter-fill');
+    const statCrackTime = document.getElementById('stat-crack-time');
+    const statEntropy = document.getElementById('stat-entropy');
+    const statLength = document.getElementById('stat-length');
+
+    const flawsContainer = document.getElementById('flaws-container');
+    const flawsList = document.getElementById('flaws-list');
+    const suggestionsList = document.getElementById('suggestions-list');
+
+    // Generator elements
+    const genLengthSlider = document.getElementById('gen-length');
+    const genLengthVal = document.getElementById('gen-length-val');
+    const generateBtn = document.getElementById('generate-btn');
+    const genPwdOutput = document.getElementById('gen-pwd-output');
+    const copyBtn = document.getElementById('copy-btn');
+    const toast = document.getElementById('toast');
+
+    // Toggle Password Visibility
+    toggleBtn.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+    });
+
+    // Realtime Analysis
+    let debounceTimer;
+    passwordInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(analyzeCurrentPassword, 150);
+    });
+
+    async function analyzeCurrentPassword() {
+      const password = passwordInput.value;
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      updateUI(data);
+    }
+
+    function updateUI(data) {
+      // Score and Rating Badge
+      scoreVal.textContent = data.score;
+      ratingBadge.textContent = data.rating.toUpperCase();
+      ratingBadge.className = 'badge ' + data.rating.toLowerCase().replace(' ', '-');
+
+      // Progress Meter
+      meterFill.style.width = data.score + '%';
+      meterFill.style.backgroundColor = data.color;
+      meterFill.style.boxShadow = `0 0 15px ${data.color}`;
+
+      // Key Stats
+      statCrackTime.textContent = data.crack_time;
+      statEntropy.textContent = data.entropy + ' bits';
+      statLength.textContent = data.length + ' chars';
+
+      // Checklist items update
+      updateCheckItem('check-len8', data.criteria.min_length_8);
+      updateCheckItem('check-len12', data.criteria.min_length_12);
+      updateCheckItem('check-lower', data.criteria.has_lowercase);
+      updateCheckItem('check-upper', data.criteria.has_uppercase);
+      updateCheckItem('check-digits', data.criteria.has_digits);
+      updateCheckItem('check-symbols', data.criteria.has_symbols);
+      updateCheckItem('check-patterns', data.criteria.no_common_patterns);
+      updateCheckItem('check-repeats', data.criteria.no_repeats);
+
+      // Flaws
+      if (data.flaws && data.flaws.length > 0) {
+        flawsContainer.style.display = 'block';
+        flawsList.innerHTML = data.flaws.map(f => `<li>${f}</li>`).join('');
+      } else {
+        flawsContainer.style.display = 'none';
+      }
+
+      // Suggestions
+      if (data.suggestions && data.suggestions.length > 0) {
+        suggestionsList.innerHTML = data.suggestions.map(s => `<li>${s}</li>`).join('');
+      }
+    }
+
+    function updateCheckItem(id, pass) {
+      const el = document.getElementById(id);
+      if (pass) {
+        el.className = 'check-item pass';
+        el.querySelector('.check-icon').textContent = '✓';
+      } else {
+        el.className = 'check-item fail';
+        el.querySelector('.check-icon').textContent = '✕';
+      }
+    }
+
+    // Generator logic
+    genLengthSlider.addEventListener('input', (e) => {
+      genLengthVal.textContent = e.target.value;
+    });
+
+    generateBtn.addEventListener('click', async () => {
+      const length = genLengthSlider.value;
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ length })
+      });
+      const data = await res.json();
+      genPwdOutput.textContent = data.generated_password;
+      
+      // Auto populate input with generated password & analyze
+      passwordInput.value = data.generated_password;
+      updateUI(data.analysis);
+    });
+
+    copyBtn.addEventListener('click', () => {
+      const textToCopy = genPwdOutput.textContent;
+      if (!textToCopy || textToCopy.includes('Click generate')) return;
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showToast('Copied password to clipboard!');
+      });
+    });
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+  </script>
+</body>
+</html>
