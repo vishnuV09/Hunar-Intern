@@ -59,7 +59,8 @@ Launch the web interface:
 ```bash
 python main.py
 ```
-Open **[http://127.0.0.1:5000](http://127.0.0.1:5000)** in your web browser.
+Open **[http://127.0.0.1:5000](C:\Users\Vishnu\.gemini\antigravity\scratch\password_strength_checker\standalone_checker.html
+)** in your web browser.
 
 #### Web Dashboard Highlights:
 - **Real-Time Evaluation**: As you type, the strength score, crack time, entropy, and checklist update instantly.
